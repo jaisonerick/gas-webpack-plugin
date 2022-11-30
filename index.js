@@ -90,6 +90,7 @@ GasDependency.Template = class GasDependencyTemplate {
 
 GasPlugin.prototype.apply = function(compiler) {
   const context = compiler.options.context;
+  const outputFilename = compiler.options.output.filename;
   const autoGlobalExportsFilePatterns = this.options.autoGlobalExportsFiles
     .map(file => path.isAbsolute(file) ? file : path.resolve(context, file));
   const includePatterns = this.options.include
@@ -125,6 +126,9 @@ GasPlugin.prototype.apply = function(compiler) {
       .tap("GasPlugin", handler);
 
     compilation.hooks.chunkAsset.tap(plugin, (chunk, filename) => {
+      if (filename !== outputFilename) {
+        return;
+      }
       gasify(compilation, chunk, filename, gasDependencyTemplate.entryFunctions)
     });
   };
